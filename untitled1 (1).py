@@ -1,18 +1,11 @@
 
 
-
-
-
-
-
-
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 # --- Definicje Kolorów ---
 RED = '#CC0000'
-BLUE = '#0066CC' # Nowy kolor niebieski
+BLUE = '#0066CC' 
 WHITE = '#FFFFFF'
 SKIN = '#FADBD8'
 BLACK = '#2C3E50'
@@ -21,58 +14,53 @@ BROWN = '#795548'
 SACK = '#B08968'
 
 # --- Zmienne Globalne dla Elementów Graficznych ---
-# Musimy przechowywać referencje do elementów, które będziemy zmieniać
-global cap_triangle, cap_band, pompon, is_red, sack_patch
-
-is_red = True # Flaga do śledzenia aktualnego koloru
+# Muszą być zdefiniowane przed użyciem w funkcjach!
+cap_triangle = None
+sack_patch = None
+is_red = True 
 
 def on_click(event):
     """
     Funkcja obsługująca zdarzenie kliknięcia myszą.
-    Sprawdza, czy kliknięcie nastąpiło w obszarze worka.
+    Sprawdza, czy kliknięcie nastąpiło w obszarze worka i zmienia kolor czapki.
     """
-    global is_red, cap_triangle, cap_band, pompon
+    global is_red, cap_triangle, sack_patch
 
-    # Sprawdzenie, czy kliknięcie nastąpiło na osi 'ax'
-    if event.inaxes != sack_patch.axes:
+    # Sprawdzenie, czy kliknięcie nastąpiło na osi 'ax' i czy worek istnieje
+    if event.inaxes != sack_patch.axes or sack_patch is None:
         return
 
-    # Sprawdzenie, czy kliknięcie nastąpiło wewnątrz obiektu 'sack_patch' (worka)
-    # Wykorzystujemy 'contains' do sprawdzenia, czy kliknięcie jest w granicach obiektu
-    cont, _ = sack_patch.contains(event) 
+    # Sprawdzenie, czy kliknięcie nastąpiło wewnątrz worka
+    cont, _ = sack_patch.contains(event)
     
     if cont:
-        # Zmiana flagi koloru
         is_red = not is_red
-        
-        # Wybór nowego koloru na podstawie flagi
         new_color = RED if is_red else BLUE
 
         # Zmiana koloru czerwonych elementów czapki
         cap_triangle.set_color(new_color)
         
-        # Opcjonalnie: zmiana koloru tytulu
+        # Zmiana koloru tytułu
         plt.gcf().suptitle("Świąteczny Mikołaj z Matplotlib", fontsize=20, color=new_color)
 
         # Wymuszenie ponownego narysowania figury
         plt.draw()
         
-        # Dodatkowa informacja zwrotna w konsoli
         print(f"Kolor czapki zmieniony na: {'Czerwony' if is_red else 'Niebieski'}")
 
 
 def narysuj_mikolaja_interaktywnego():
     """Tworzy figurę Mikołaja i ustawia obsługę interakcji."""
-    global cap_triangle, cap_band, pompon, sack_patch
+    global cap_triangle, sack_patch
 
     # --- Ustawienia Figury i Osi ---
     fig, ax = plt.subplots(1, figsize=(6, 8))
-    ax.set_facecolor('#E0F7FA')
+    ax.set_facecolor('#E0F7FA') 
     ax.set_xlim(0, 10)
     ax.set_ylim(0, 10)
     ax.axis('off')
 
-    # --- 1. Mikołaj (Głowa i Ciało - bez zmian) ---
+    # --- 1. Mikołaj (Głowa i Ciało) ---
     face = patches.Circle((5, 5.5), 1.2, color=SKIN)
     ax.add_patch(face)
     beard = patches.Ellipse((5, 4.5), 3, 2.5, color=WHITE)
@@ -95,16 +83,11 @@ def narysuj_mikolaja_interaktywnego():
     hand_right = patches.Circle((7.8, 4.2), 0.3, color=WHITE)
     ax.add_patch(hand_right)
 
-    # --- 2. Czapka (Przypisujemy do zmiennych globalnych) ---
-    # Czerwona część (referencja globalna)
+    # --- 2. Czapka (Przypisanie do zmiennej globalnej) ---
     cap_triangle = patches.Polygon([[3.5, 6.5], [6.5, 6.5], [5.5, 9.0]], color=RED)
     ax.add_patch(cap_triangle)
-
-    # Biały pasek czapki (referencja globalna - opcjonalnie)
     cap_band = patches.Rectangle((3.5, 6.5), 3, 0.5, color=WHITE)
     ax.add_patch(cap_band)
-
-    # Biały pompon (referencja globalna - opcjonalnie)
     pompon = patches.Circle((5.5, 9.0), 0.3, color=WHITE)
     ax.add_patch(pompon)
 
@@ -118,11 +101,9 @@ def narysuj_mikolaja_interaktywnego():
     boot_right = patches.Rectangle((5.3, 1.0), 0.7, 0.5, color=BLACK)
     ax.add_patch(boot_right)
 
-    # --- 4. Worek z Prezentami (Referencja globalna do worka) ---
-    # Worek (sack_patch musi być globalne, żeby funkcja on_click mogła je sprawdzić)
+    # --- 4. Worek z Prezentami (Przypisanie do zmiennej globalnej) ---
     sack_patch = patches.Rectangle((1.5, 2.0), 1.5, 2.5, color=SACK)
     ax.add_patch(sack_patch)
-
     sack_top = patches.Ellipse((2.25, 4.5), 1.7, 0.5, angle=0, color=BROWN)
     ax.add_patch(sack_top)
     ax.plot(2.25, 4.5, 'o', color=WHITE, markersize=10, zorder=5)
@@ -131,13 +112,20 @@ def narysuj_mikolaja_interaktywnego():
     plt.text(5, 0.5, 'Kliknij Worek!', ha='center', fontsize=18, color=RED, weight='bold')
 
     # --- 6. Wyświetlenie i Interakcja ---
-    # Ustawienie tytułu figury
     fig.suptitle("Świąteczny Mikołaj z Matplotlib", fontsize=20, color=RED)
     
-    # Podłączenie funkcji on_click do zdarzeń naciśnięcia przycisku myszy
+    # Podłączenie obsługi kliknięcia
     fig.canvas.mpl_connect('button_press_event', on_click)
     
     plt.show()
 
-# Wywołanie funkcji, aby uruchomić rysowanie
+# --- Główny Punkt Startowy ---
+# Wywołujemy tylko jedną poprawną funkcję
 narysuj_mikolaja_interaktywnego()
+
+
+
+
+
+
+
