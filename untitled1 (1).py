@@ -1,22 +1,9 @@
-
-Świetnie! Dodanie interaktywności w Streamlit jest nieco inne niż w standardowym Matplotlib w Colab, ponieważ Streamlit działa na zasadzie odświeżania strony przy zmianie stanu (np. kliknięcie przycisku, zmiana suwaka).
-
-Aby uzyskać interaktywną zmianę koloru czapki, użyjemy widgetu Streamlit (np. przycisku lub pola wyboru), a nie bezpośredniego kliknięcia na element Matplotlib.
-
-Oto zmodyfikowany kod, który wykorzystuje przycisk Streamlit do zmiany koloru czapki. 🎨
-
-💻 Kod Python dla Streamlit z Interaktywnością
-Zapisz ten kod jako plik np. mikolaj_interactive.py:
-
-Python
-
 import streamlit as st
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
-# --- Definicje Kolorów ---
+# --- Definicje Kolorów (możesz je przenieść do innej sekcji, jeśli wolisz) ---
 RED = '#CC0000'
-BLUE = '#0066CC'
 WHITE = '#FFFFFF'
 SKIN = '#FADBD8'
 BLACK = '#2C3E50'
@@ -24,12 +11,11 @@ GOLD = '#FFC300'
 BROWN = '#795548'
 SACK = '#B08968' 
 
-def narysuj_mikolaja_z_workiem(cap_color):
-    """
-    Tworzy figurę Matplotlib Mikołaja, akceptując kolor czapki jako argument.
-    """
+def narysuj_mikolaja_z_workiem():
+    """Tworzy figurę Matplotlib Mikołaja i zwraca ją (zamiast pokazywać)."""
     
     # --- Ustawienia Figury i Osi ---
+    # Fig i ax są tworzone jako lokalne obiekty Matplotlib
     fig, ax = plt.subplots(1, figsize=(6, 8))
     ax.set_facecolor('#E0F7FA') # Jasnoniebieskie, zimowe tło
     ax.set_xlim(0, 10)
@@ -59,8 +45,8 @@ def narysuj_mikolaja_z_workiem(cap_color):
     hand_right = patches.Circle((7.8, 4.2), 0.3, color=WHITE)
     ax.add_patch(hand_right)
 
-    # --- 2. Czapka (Używamy koloru z argumentu funkcji) ---
-    cap_triangle = patches.Polygon([[3.5, 6.5], [6.5, 6.5], [5.5, 9.0]], color=cap_color)
+    # --- 2. Czapka ---
+    cap_triangle = patches.Polygon([[3.5, 6.5], [6.5, 6.5], [5.5, 9.0]], color=RED)
     ax.add_patch(cap_triangle)
     cap_band = patches.Rectangle((3.5, 6.5), 3, 0.5, color=WHITE)
     ax.add_patch(cap_band)
@@ -85,40 +71,28 @@ def narysuj_mikolaja_z_workiem(cap_color):
     ax.plot(2.25, 4.5, 'o', color=WHITE, markersize=10, zorder=5) 
 
     # --- 5. Napis świąteczny ---
-    plt.text(5, 0.5, 'Użyj przycisku, aby zmienić czapkę!', ha='center', fontsize=18, color=cap_color, weight='bold')
+    plt.text(5, 0.5, 'Ho Ho Ho! Wesołych Świąt!', ha='center', fontsize=18, color=RED, weight='bold')
     
     # --- 6. Tytuł ---
-    plt.title("Świąteczny Mikołaj z Matplotlib", fontsize=20, color=cap_color)
+    plt.title("Świąteczny Mikołaj z Matplotlib", fontsize=20, color=RED)
     
+    # Zwrócenie figury do Streamlit
     return fig
 
 # --- Główna Aplikacja Streamlit ---
 def app():
-    st.title("🎅 Mikołaj: Interaktywna Czapka")
+    # Ustawienie tytułu na stronie Streamlit
+    st.title("🎅 Mikołaj: Geometria Matplotlib w Streamlit")
     st.markdown("---")
     
-    # 1. ZARZĄDZANIE STANEM W STREAMLIT
-    # Używamy session_state do śledzenia aktualnego koloru
-    if 'cap_is_red' not in st.session_state:
-        st.session_state.cap_is_red = True
-        
-    # 2. PRZYCISK ZMIENIAJĄCY STAN
-    # Przycisk zmienia wartość w st.session_state
-    if st.button('Zmień kolor czapki!'):
-        st.session_state.cap_is_red = not st.session_state.cap_is_red
-        
-    # 3. PRZEKAZANIE KOLORU
-    # Ustawienie koloru, który zostanie przekazany do funkcji rysującej
-    current_cap_color = RED if st.session_state.cap_is_red else BLUE
+    # Wywołanie funkcji rysującej, która zwraca figurę Matplotlib
+    mikolaj_figura = narysuj_mikolaja_z_workiem()
     
-    # Wyświetlenie aktualnego koloru
-    st.write(f"Aktualny kolor czapki: **{'Czerwony' if st.session_state.cap_is_red else 'Niebieski'}**")
-
-    # 4. RYSOWANIE
-    mikolaj_figura = narysuj_mikolaja_z_workiem(current_cap_color)
+    # Wyświetlenie figury w aplikacji Streamlit
     st.pyplot(mikolaj_figura)
     
     st.markdown("---")
+    st.info("Ten Mikołaj został narysowany za pomocą biblioteki Matplotlib i wyświetlony przez Streamlit.")
 
 # Uruchomienie aplikacji
 if __name__ == "__main__":
